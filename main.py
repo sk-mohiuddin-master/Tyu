@@ -252,21 +252,32 @@ def get_player_info(uid):
     url = "https://shop2game.com/api/auth/player_id_login"
     headers = {
         "Accept": "application/json",
+        "Accept-Encoding": "gzip, deflate, br",
+        "Accept-Language": "en-US,en;q=0.9,en;q=0.8",
         "Content-Type": "application/json",
         "Origin": "https://shop2game.com",
-        "Referer": "https://shop2game.com/app",
-        "User-Agent": "Mozilla/5.0",
+        "Referer": "https://shop2game.com/"
     }
+
     payload = {
         "app_id": 100067,
         "login_id": uid,
-        "app_server_id": 0,
+        "app_server_id": 0
     }
+
     try:
-        response = requests.post(url, headers=headers, json=payload, timeout=10)
-        return response.json() if response.status_code == 200 else None
-    except:
-        return None
+        response = requests.post(url, headers=headers, json=payload)
+        if response.status_code == 200:
+            data = response.json()
+            if "nickname" in data and "region" in data:
+                return {
+                    "nickname": data["nickname"],
+                    "region": data["region"]
+                }
+    except Exception as e:
+        print("❌ Error fetching UID:", e)
+
+    return None
 
 # === BOT LOOP ===
 def bot_loop():
